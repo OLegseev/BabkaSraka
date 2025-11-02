@@ -1,0 +1,14 @@
+# Unreal Engine
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+*.sln
+*.xcodeproj
+*.xcworkspace
+.vs/
+.DS_Store
+
+# Optional: если хотите сэкономить место
+# Content/DownloadedDevAssets/
