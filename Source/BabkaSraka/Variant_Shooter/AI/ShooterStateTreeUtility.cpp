@@ -225,7 +225,6 @@ EStateTreeRunStatus FStateTreeSenseEnemiesTask::EnterState(FStateTreeExecutionCo
 			{
 				// get the instance data inside the lambda
 				const FStateTreeStrongExecutionContext StrongContext = WeakContext.MakeStrongExecutionContext();
-
 				if (FInstanceDataType* LambdaInstanceData = StrongContext.GetInstanceDataPtr<FInstanceDataType>())
 				{
 					if (SensedActor->ActorHasTag(LambdaInstanceData->SenseTag))
@@ -297,46 +296,42 @@ EStateTreeRunStatus FStateTreeSenseEnemiesTask::EnterState(FStateTreeExecutionCo
 			[WeakContext = Context.MakeWeakExecutionContext()](AActor* SensedActor)
 			{
 				// get the instance data inside the lambda
-				FInstanceDataType* LambdaInstanceData = WeakContext.MakeStrongExecutionContext().GetInstanceDataPtr<FInstanceDataType>();
-
-				if (!LambdaInstanceData)
+				const FStateTreeStrongExecutionContext StrongContext = WeakContext.MakeStrongExecutionContext();
+				if (FInstanceDataType* LambdaInstanceData = StrongContext.GetInstanceDataPtr<FInstanceDataType>())
 				{
-					return;
-				}
+					bool bForget = false;
 
-				bool bForget = false;
-
-				// are we forgetting the current target?
-				if (SensedActor == LambdaInstanceData->TargetActor)
-				{
-					bForget = true;
-
-				} else {
-
-					// are we forgetting about a partial sense?
-					if (!IsValid(LambdaInstanceData->TargetActor))
+					// are we forgetting the current target?
+					if (SensedActor == LambdaInstanceData->TargetActor)
 					{
 						bForget = true;
 					}
+					else 
+					{
+						// are we forgetting about a partial sense?
+						if (!IsValid(LambdaInstanceData->TargetActor))
+						{
+							bForget = true;
+						}
+					}
+
+					if (bForget)
+					{
+						// clear the target
+						LambdaInstanceData->TargetActor = nullptr;
+
+						// clear the flags
+						LambdaInstanceData->bHasInvestigateLocation = false;
+						LambdaInstanceData->bHasTarget = false;
+
+						// reset the stimulus strength
+						LambdaInstanceData->LastStimulusStrength = 0.0f;
+
+						// clear the target on the controller
+						LambdaInstanceData->Controller->ClearCurrentTarget();
+						LambdaInstanceData->Controller->ClearFocus(EAIFocusPriority::Gameplay);
+					}
 				}
-
-				if (bForget)
-				{
-					// clear the target
-					LambdaInstanceData->TargetActor = nullptr;
-
-					// clear the flags
-					LambdaInstanceData->bHasInvestigateLocation = false;
-					LambdaInstanceData->bHasTarget = false;
-
-					// reset the stimulus strength
-					LambdaInstanceData->LastStimulusStrength = 0.0f;
-
-					// clear the target on the controller
-					LambdaInstanceData->Controller->ClearCurrentTarget();
-					LambdaInstanceData->Controller->ClearFocus(EAIFocusPriority::Gameplay);
-				}
-
 			}
 		);
 	}

@@ -15,7 +15,7 @@ class UShooterBulletCounterUI;
  *  Manages input mappings
  *  Respawns the player pawn when it's destroyed
  */
-UCLASS(abstract)
+UCLASS(abstract, config="Game")
 class BABKASRAKA_API AShooterPlayerController : public APlayerController
 {
 	GENERATED_BODY()
@@ -35,7 +35,12 @@ protected:
 	TSubclassOf<UUserWidget> MobileControlsWidgetClass;
 
 	/** Pointer to the mobile controls widget */
+	UPROPERTY()
 	TObjectPtr<UUserWidget> MobileControlsWidget;
+
+	/** If true, the player will use UMG touch controls even if not playing on mobile platforms */
+	UPROPERTY(EditAnywhere, Config, Category = "Input|Touch Controls")
+	bool bForceTouchControls = false;
 
 	/** Character class to respawn when the possessed pawn is destroyed */
 	UPROPERTY(EditAnywhere, Category="Shooter|Respawn")
@@ -50,6 +55,7 @@ protected:
 	FName PlayerPawnTag = FName("Player");
 
 	/** Pointer to the bullet counter UI widget */
+	UPROPERTY()
 	TObjectPtr<UShooterBulletCounterUI> BulletCounterUI;
 
 protected:
@@ -74,4 +80,7 @@ protected:
 	/** Called when the possessed pawn is damaged */
 	UFUNCTION()
 	void OnPawnDamaged(float LifePercent);
+
+	/** Returns true if the player should use UMG touch controls */
+	bool ShouldUseTouchControls() const;
 };

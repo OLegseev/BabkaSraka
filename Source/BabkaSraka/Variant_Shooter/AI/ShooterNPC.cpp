@@ -62,7 +62,7 @@ void AShooterNPC::AttachWeaponMeshes(AShooterWeapon* WeaponToAttach)
 
 	// attach the weapon meshes
 	WeaponToAttach->GetFirstPersonMesh()->AttachToComponent(GetFirstPersonMesh(), AttachmentRule, FirstPersonWeaponSocket);
-	WeaponToAttach->GetThirdPersonMesh()->AttachToComponent(GetMesh(), AttachmentRule, FirstPersonWeaponSocket);
+	WeaponToAttach->GetThirdPersonMesh()->AttachToComponent(GetMesh(), AttachmentRule, ThirdPersonWeaponSocket);
 }
 
 void AShooterNPC::PlayFiringMontage(UAnimMontage* Montage)
@@ -158,6 +158,12 @@ void AShooterNPC::Die()
 
 	// raise the dead flag
 	bIsDead = true;
+
+	// grant the death tag to the character
+	Tags.Add(DeathTag);
+
+	// call the delegate
+	OnPawnDeath.Broadcast();
 
 	// increment the team score
 	if (AShooterGameMode* GM = Cast<AShooterGameMode>(GetWorld()->GetAuthGameMode()))

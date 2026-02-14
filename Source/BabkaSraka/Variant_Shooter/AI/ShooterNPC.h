@@ -41,6 +41,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Team")
 	uint8 TeamByte = 1;
 
+	/** Actor tag to grant this character when it dies */
+	UPROPERTY(EditAnywhere, Category="Team")
+	FName DeathTag = FName("Dead");
+
 	/** Pointer to the equipped weapon */
 	TObjectPtr<AShooterWeapon> Weapon;
 

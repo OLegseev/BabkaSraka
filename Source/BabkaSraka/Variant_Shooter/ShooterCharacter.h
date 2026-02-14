@@ -62,6 +62,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Team")
 	uint8 TeamByte = 0;
 
+	/** Actor tag to grant this character when it dies */
+	UPROPERTY(EditAnywhere, Category="Team")
+	FName DeathTag = FName("Dead");
+
 	/** List of weapons picked up by the character */
 	TArray<AShooterWeapon*> OwnedWeapons;
 
@@ -103,6 +107,18 @@ public:
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 public:
+
+	/** Handles aim inputs from either controls or UI interfaces */
+	virtual void DoAim(float Yaw, float Pitch) override;
+
+	/** Handles move inputs from either controls or UI interfaces */
+	virtual void DoMove(float Right, float Forward)  override;
+
+	/** Handles jump start inputs from either controls or UI interfaces */
+	virtual void DoJumpStart()  override;
+
+	/** Handles jump end inputs from either controls or UI interfaces */
+	virtual void DoJumpEnd()  override;
 
 	/** Handles start firing input */
 	UFUNCTION(BlueprintCallable, Category="Input")
@@ -163,4 +179,9 @@ protected:
 
 	/** Called from the respawn timer to destroy this character and force the PC to respawn */
 	void OnRespawn();
+
+public:
+
+	/** Returns true if the character is dead */
+	bool IsDead() const;
 };

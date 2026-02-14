@@ -14,7 +14,7 @@ class UHorrorUI;
  *  Manages input mappings
  *  Manages UI
  */
-UCLASS(abstract)
+UCLASS(abstract, config="Game")
 class BABKASRAKA_API AHorrorPlayerController : public APlayerController
 {
 	GENERATED_BODY()
@@ -26,6 +26,7 @@ protected:
 	TSubclassOf<UHorrorUI> HorrorUIClass;
 
 	/** Pointer to the UI widget */
+	UPROPERTY()
 	TObjectPtr<UHorrorUI> HorrorUI;
 
 public:
@@ -50,6 +51,10 @@ protected:
 	/** Pointer to the mobile controls widget */
 	TObjectPtr<UUserWidget> MobileControlsWidget;
 
+	/** If true, the player will use UMG touch controls even if not playing on mobile platforms */
+	UPROPERTY(EditAnywhere, Config, Category = "Input|Touch Controls")
+	bool bForceTouchControls = false;
+
 	/** Gameplay Initialization */
 	virtual void BeginPlay() override;
 
@@ -59,4 +64,6 @@ protected:
 	/** Input mapping context setup */
 	virtual void SetupInputComponent() override;
 
+	/** Returns true if the player should use UMG touch controls */
+	bool ShouldUseTouchControls() const;
 };

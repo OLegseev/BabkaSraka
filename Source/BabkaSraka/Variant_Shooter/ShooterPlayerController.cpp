@@ -19,7 +19,7 @@ void AShooterPlayerController::BeginPlay()
 	// only spawn touch controls on local player controllers
 	if (IsLocalPlayerController())
 	{
-		if (SVirtualJoystick::ShouldDisplayTouchInterface())
+		if (ShouldUseTouchControls())
 		{
 			// spawn the mobile controls widget
 			MobileControlsWidget = CreateWidget<UUserWidget>(this, MobileControlsWidgetClass);
@@ -54,6 +54,8 @@ void AShooterPlayerController::BeginPlay()
 
 void AShooterPlayerController::SetupInputComponent()
 {
+	Super::SetupInputComponent();
+
 	// only add IMCs for local player controllers
 	if (IsLocalPlayerController())
 	{
@@ -66,7 +68,7 @@ void AShooterPlayerController::SetupInputComponent()
 			}
 
 			// only add these IMCs if we're not using mobile touch input
-			if (!SVirtualJoystick::ShouldDisplayTouchInterface())
+			if (!ShouldUseTouchControls())
 			{
 				for (UInputMappingContext* CurrentContext : MobileExcludedMappingContexts)
 				{
@@ -102,7 +104,10 @@ void AShooterPlayerController::OnPossess(APawn* InPawn)
 void AShooterPlayerController::OnPawnDestroyed(AActor* DestroyedActor)
 {
 	// reset the bullet counter HUD
-	BulletCounterUI->BP_UpdateBulletCounter(0, 0);
+	if (IsValid(BulletCounterUI))
+	{
+		BulletCounterUI->BP_UpdateBulletCounter(0, 0);
+	}
 
 	// find the player start
 	TArray<AActor*> ActorList;
@@ -139,4 +144,10 @@ void AShooterPlayerController::OnPawnDamaged(float LifePercent)
 	{
 		BulletCounterUI->BP_Damaged(LifePercent);
 	}
+}
+
+bool AShooterPlayerController::ShouldUseTouchControls() const
+{
+	// are we on a mobile platform? Should we force touch?
+	return SVirtualJoystick::ShouldDisplayTouchInterface() || bForceTouchControls;
 }

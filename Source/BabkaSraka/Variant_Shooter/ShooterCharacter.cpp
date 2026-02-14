@@ -82,10 +82,46 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 	return Damage;
 }
 
+void AShooterCharacter::DoAim(float Yaw, float Pitch)
+{
+	// only route inputs if the character is not dead
+	if (!IsDead())
+	{
+		Super::DoAim(Yaw, Pitch);
+	}
+}
+
+void AShooterCharacter::DoMove(float Right, float Forward)
+{
+	// only route inputs if the character is not dead
+	if (!IsDead())
+	{
+		Super::DoMove(Right, Forward);
+	}
+}
+
+void AShooterCharacter::DoJumpStart()
+{
+	// only route inputs if the character is not dead
+	if (!IsDead())
+	{
+		Super::DoJumpStart();
+	}
+}
+
+void AShooterCharacter::DoJumpEnd()
+{
+	// only route inputs if the character is not dead
+	if (!IsDead())
+	{
+		Super::DoJumpEnd();
+	}
+}
+
 void AShooterCharacter::DoStartFiring()
 {
 	// fire the current weapon
-	if (CurrentWeapon)
+	if (CurrentWeapon && !IsDead())
 	{
 		CurrentWeapon->StartFiring();
 	}
@@ -94,7 +130,7 @@ void AShooterCharacter::DoStartFiring()
 void AShooterCharacter::DoStopFiring()
 {
 	// stop firing the current weapon
-	if (CurrentWeapon)
+	if (CurrentWeapon && !IsDead())
 	{
 		CurrentWeapon->StopFiring();
 	}
@@ -103,7 +139,7 @@ void AShooterCharacter::DoStopFiring()
 void AShooterCharacter::DoSwitchWeapon()
 {
 	// ensure we have at least two weapons two switch between
-	if (OwnedWeapons.Num() > 1)
+	if (OwnedWeapons.Num() > 1 && !IsDead())
 	{
 		// deactivate the old weapon
 		CurrentWeapon->DeactivateWeapon();
@@ -145,7 +181,7 @@ void AShooterCharacter::AttachWeaponMeshes(AShooterWeapon* Weapon)
 
 void AShooterCharacter::PlayFiringMontage(UAnimMontage* Montage)
 {
-	
+	// stub
 }
 
 void AShooterCharacter::AddWeaponRecoil(float Recoil)
@@ -259,6 +295,9 @@ void AShooterCharacter::Die()
 	{
 		GM->IncrementTeamScore(TeamByte);
 	}
+
+	// grant the death tag to the character
+	Tags.Add(DeathTag);
 		
 	// stop character movement
 	GetCharacterMovement()->StopMovementImmediately();
@@ -280,4 +319,10 @@ void AShooterCharacter::OnRespawn()
 {
 	// destroy the character to force the PC to respawn
 	Destroy();
+}
+
+bool AShooterCharacter::IsDead() const
+{
+	// the character is dead if their current HP drops to zero
+	return CurrentHP <= 0.0f;
 }
